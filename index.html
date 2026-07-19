@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>マイプロジェクト曼荼羅ジェネレーター</title>
+<style>
+  :root{
+    --bg:#f7f6f2;
+    --panel:#ffffff;
+    --line:#e4e1d8;
+    --ink:#2b2b28;
+    --sub:#7c776c;
+    --accent:#455a6b;
+    --accent-ink:#ffffff;
+    --field:#fcfbf8;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    background:var(--bg);
+    color:var(--ink);
+    font-family:"Hiragino Sans","Hiragino Kaku Gothic ProN","Yu Gothic","Noto Sans JP",sans-serif;
+    line-height:1.6;
+    -webkit-font-smoothing:antialiased;
+  }
+  .wrap{max-width:1180px;margin:0 auto;padding:32px 24px 64px;}
+  header h1{font-size:20px;font-weight:700;margin:0 0 4px;letter-spacing:.02em;}
+  header p{margin:0 0 24px;color:var(--sub);font-size:13px;}
+  .layout{display:grid;grid-template-columns:380px 1fr;gap:28px;align-items:start;}
+  @media(max-width:880px){.layout{grid-template-columns:1fr;}}
+
+  .panel{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:20px;}
+
+  .field{margin-bottom:16px;}
+  .field:last-child{margin-bottom:0;}
+  .rolewrap{display:flex;align-items:center;gap:7px;margin-bottom:6px;}
+  .swatch{width:12px;height:12px;border-radius:50%;flex:0 0 auto;border:1px solid rgba(0,0,0,.12);}
+  .rolewrap .pos{font-size:12px;font-weight:600;color:var(--sub);letter-spacing:.02em;}
+  textarea{
+    width:100%;border:1px solid var(--line);border-radius:9px;background:var(--field);
+    padding:9px 11px;font-family:inherit;font-size:14px;color:var(--ink);resize:vertical;line-height:1.5;
+    min-height:64px;
+  }
+  textarea:focus{outline:none;border-color:var(--accent);background:#fff;}
+
+  .hint{font-size:11.5px;color:var(--sub);margin-top:14px;line-height:1.7;}
+  .hint code{background:#f0eee7;padding:1px 5px;border-radius:4px;font-size:11px;}
+
+  .controls{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-top:18px;}
+  button{
+    font-family:inherit;font-size:14px;font-weight:600;border-radius:9px;cursor:pointer;
+    padding:10px 18px;border:1px solid var(--accent);
+  }
+  button.primary{background:var(--accent);color:var(--accent-ink);}
+  button.primary:hover{background:#38495a;}
+  button.ghost{background:transparent;color:var(--accent);}
+  button.ghost:hover{background:#eef1f3;}
+
+  .stage{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:20px;position:sticky;top:20px;}
+  .stage svg{width:100%;height:auto;display:block;}
+  .cap{font-size:11.5px;color:var(--sub);text-align:center;margin-top:10px;}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>マイプロジェクト曼荼羅ジェネレーター</h1>
+    <p>Who（本来の自分）/ Why（ほしい未来）/ Which（リソース）/ How（デザイン）を、ひとつの曼荼羅に。テキストを書き換えて画像で書き出せます。</p>
+  </header>
+
+  <div class="layout">
+    <!-- INPUT -->
+    <div>
+      <div class="panel">
+        <div class="field">
+          <div class="rolewrap">
+            <span class="swatch" style="background:#ffffff"></span>
+            <span class="pos">中心 ・ プロジェクト</span>
+          </div>
+          <textarea id="f-center">旅する
+学長室の
+記録集</textarea>
+        </div>
+
+        <div class="field">
+          <div class="rolewrap">
+            <span class="swatch" style="background:#CFDEFC"></span>
+            <span class="pos">下 ・ Who / 本来の自分</span>
+          </div>
+          <textarea id="f-bottom">置かれるべき
+場所に置かれる
+ことの尊さを
+祝福する
+「古道具屋」</textarea>
+        </div>
+
+        <div class="field">
+          <div class="rolewrap">
+            <span class="swatch" style="background:#FAE6F1"></span>
+            <span class="pos">上 ・ Why / ほしい未来</span>
+          </div>
+          <textarea id="f-top">誰もが
+自分の近くに
+**0th place**を
+持てる未来</textarea>
+        </div>
+
+        <div class="field">
+          <div class="rolewrap">
+            <span class="swatch" style="background:#FFFED7"></span>
+            <span class="pos">左 ・ Which / リソース</span>
+          </div>
+          <textarea id="f-left">自宅
+ジョルジュ・ペレック</textarea>
+        </div>
+
+        <div class="field">
+          <div class="rolewrap">
+            <span class="swatch" style="background:#ECF6E0"></span>
+            <span class="pos">右 ・ How / デザイン</span>
+          </div>
+          <textarea id="f-right">偏愛をつめこんだ
+**ZINE**</textarea>
+        </div>
+
+        <div class="hint">
+          改行はそのまま円の中で改行されます。<br>
+          <code>**太字**</code> で囲むと、その部分が太字になります（例：<code>**0th place**</code>）。
+        </div>
+
+        <div class="controls">
+          <button class="primary" id="btn-dl">PNGでダウンロード</button>
+          <button class="ghost" id="btn-reset">サンプルに戻す</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- PREVIEW -->
+    <div class="stage">
+      <svg id="mandala" xmlns="http://www.w3.org/2000/svg" width="960" height="720" viewBox="0 0 960 720"></svg>
+      <div class="cap">プレビュー（入力するとリアルタイムに反映されます）</div>
+    </div>
+  </div>
+</div>
+
+<script>
+const SVGNS = "http://www.w3.org/2000/svg";
+
+// --- layout constants ---
+const CX = 480, CY = 378;
+const OUTER_R = 345;
+const CENTER_R = 110;
+const PETAL_R = 112;
+const D = 228; // distance from center to petal center
+
+const NODES = {
+  top:    {x: CX,     y: CY - D, r: PETAL_R, fill:"#FAE6F1"},
+  bottom: {x: CX,     y: CY + D, r: PETAL_R, fill:"#CFDEFC"},
+  left:   {x: CX - D, y: CY,     r: PETAL_R, fill:"#FFFED7"},
+  right:  {x: CX + D, y: CY,     r: PETAL_R, fill:"#ECF6E0"},
+};
+
+const DEFAULTS = {
+  center:"旅する\n学長室の\n記録集",
+  top:"誰もが\n自分の近くに\n**0th place**を\n持てる未来",
+  left:"自宅\nジョルジュ・ペレック",
+  right:"偏愛をつめこんだ\n**ZINE**",
+  bottom:"置かれるべき\n場所に置かれる\nことの尊さを\n祝福する\n「古道具屋」",
+};
+
+const el = id => document.getElementById(id);
+
+function make(tag, attrs){
+  const n = document.createElementNS(SVGNS, tag);
+  for(const k in attrs) n.setAttribute(k, attrs[k]);
+  return n;
+}
+
+// parse **bold** into segments
+function segsFor(line){
+  const out = [];
+  const parts = line.split("**");
+  for(let i=0;i<parts.length;i++){
+    if(parts[i] === "") continue;
+    out.push({t: parts[i], bold: i % 2 === 1});
+  }
+  if(out.length === 0) out.push({t:"", bold:false});
+  return out;
+}
+
+// render a block of text centered on (cx,cy)
+function textBlock(cx, cy, raw, fontSize, color){
+  const g = make("g", {});
+  const lines = (raw || "").replace(/\r/g,"").split("\n");
+  const lh = fontSize * 1.32;
+  const startY = cy - ((lines.length - 1) * lh) / 2;
+  lines.forEach((line, i) => {
+    const y = startY + i * lh;
+    const t = make("text", {
+      x: cx, y: y,
+      "text-anchor":"middle",
+      "dominant-baseline":"central",
+      "font-size": fontSize,
+      "fill": color,
+      "font-family":"'Hiragino Sans','Hiragino Kaku Gothic ProN','Yu Gothic','Noto Sans JP',sans-serif"
+    });
+    segsFor(line).forEach(seg => {
+      const ts = make("tspan", seg.bold ? {"font-weight":"700"} : {});
+      ts.textContent = seg.t;
+      t.appendChild(ts);
+    });
+    g.appendChild(t);
+  });
+  return g;
+}
+
+function circle(cx, cy, r, fill){
+  return make("circle", {cx, cy, r, fill, stroke:"#8f8f8f", "stroke-width":1.2});
+}
+
+function render(){
+  const svg = el("mandala");
+  while(svg.firstChild) svg.removeChild(svg.firstChild);
+
+  // white background (for PNG)
+  svg.appendChild(make("rect", {x:0, y:0, width:960, height:720, fill:"#ffffff"}));
+
+  // outer circle
+  svg.appendChild(circle(CX, CY, OUTER_R, "#ffffff"));
+
+  const texts = {top:el("f-top").value, left:el("f-left").value, right:el("f-right").value, bottom:el("f-bottom").value};
+
+  // petals
+  for(const key of ["top","left","right","bottom"]){
+    const n = NODES[key];
+    svg.appendChild(make("circle", {cx:n.x, cy:n.y, r:n.r, fill:n.fill, stroke:"#9a9a9a", "stroke-width":1}));
+    svg.appendChild(textBlock(n.x, n.y, texts[key], 18, "#222"));
+  }
+
+  // center circle (on top so its border is clean)
+  svg.appendChild(circle(CX, CY, CENTER_R, "#ffffff"));
+  svg.appendChild(textBlock(CX, CY, el("f-center").value, 21, "#222"));
+}
+
+// download as PNG (2x)
+function download(){
+  const svg = el("mandala");
+  const clone = svg.cloneNode(true);
+  clone.setAttribute("xmlns", SVGNS);
+  clone.setAttribute("width", 960);
+  clone.setAttribute("height", 720);
+  const data = new XMLSerializer().serializeToString(clone);
+  const blob = new Blob([data], {type:"image/svg+xml;charset=utf-8"});
+  const url = URL.createObjectURL(blob);
+  const img = new Image();
+  img.onload = function(){
+    const scale = 2;
+    const canvas = document.createElement("canvas");
+    canvas.width = 960 * scale;
+    canvas.height = 720 * scale;
+    const ctx = canvas.getContext("2d");
+    ctx.fillStyle = "#ffffff";
+    ctx.fillRect(0,0,canvas.width, canvas.height);
+    ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+    URL.revokeObjectURL(url);
+    canvas.toBlob(function(b){
+      const a = document.createElement("a");
+      a.href = URL.createObjectURL(b);
+      a.download = "project-mandala.png";
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+    }, "image/png");
+  };
+  img.onerror = function(){ alert("画像の生成に失敗しました。もう一度お試しください。"); URL.revokeObjectURL(url); };
+  img.src = url;
+}
+
+function resetAll(){
+  el("f-center").value = DEFAULTS.center;
+  el("f-top").value = DEFAULTS.top;
+  el("f-left").value = DEFAULTS.left;
+  el("f-right").value = DEFAULTS.right;
+  el("f-bottom").value = DEFAULTS.bottom;
+  render();
+}
+
+// wire up
+["f-center","f-top","f-left","f-right","f-bottom"].forEach(id=>{
+  el(id).addEventListener("input", render);
+});
+el("btn-dl").addEventListener("click", download);
+el("btn-reset").addEventListener("click", resetAll);
+
+render();
+</script>
+</body>
+</html>
